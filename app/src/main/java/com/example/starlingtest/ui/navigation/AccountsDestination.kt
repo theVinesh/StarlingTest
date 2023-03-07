@@ -1,6 +1,5 @@
 package com.example.starlingtest.ui.navigation
 
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -15,7 +14,14 @@ fun NavGraphBuilder.accountsDestination(
     composable(
         route = Destination.ACCOUNTS.name
     ) {
-        val vm = AccountsScreenVm.create(owner = vmOwner)
+        val vm = AccountsScreenVm.create(
+            owner = vmOwner,
+            onTap = {
+                navController.navigate(
+                    "${Destination.TRANSACTIONS.name}/${it.accountUid}/${it.mainWalletUid}"
+                )
+            }
+        )
         AccountsScreen(
             viewModel = vm
         )

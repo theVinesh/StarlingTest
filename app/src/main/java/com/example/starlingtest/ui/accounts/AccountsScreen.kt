@@ -89,25 +89,25 @@ fun AccountsListPreview() {
                     accounts = listOf(
                         Account(
                             accountUid = "1",
-                            mainAccountUid = "",
+                            mainWalletUid = "",
                             currency = "GBP",
                             name = "Personal",
                         ),
                         Account(
                             accountUid = "2",
-                            mainAccountUid = "",
+                            mainWalletUid = "",
                             currency = "GBP",
                             name = "Joint",
                         ),
                         Account(
                             accountUid = "3",
-                            mainAccountUid = "",
+                            mainWalletUid = "",
                             currency = "EUR",
                             name = "Euro",
                         ),
                         Account(
                             accountUid = "4",
-                            mainAccountUid = "",
+                            mainWalletUid = "",
                             currency = "INR",
                             name = "Indian Rupee",
                         )

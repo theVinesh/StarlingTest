@@ -4,6 +4,7 @@ import com.example.starlingtest.ui.accounts.states.Account
 import com.example.starlingtest.ui.accounts.states.AccountsState
 import com.example.starlingtest.ui.accounts.states.AccountsUIState
 
+
 class AccountsStateReducer {
 
     fun computeUiState(state: AccountsState): AccountsUIState {
