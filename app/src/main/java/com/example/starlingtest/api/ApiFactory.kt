@@ -15,7 +15,7 @@ class ApiFactory {
         .addConverterFactory(KotlinXConvertorFactory.getConvertorFactory())
         .build()
 
-    fun createStarlingTestApi(): StarlingTestApi = retrofit.create(StarlingTestApi::class.java)
+    fun createStarlingTestApi(): StarlingApi = retrofit.create(StarlingApi::class.java)
 
     private companion object {
         private const val BASE_URL = "https://api-sandbox.starlingbank.com/api/v2/"
