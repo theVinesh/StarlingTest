@@ -22,7 +22,7 @@ sealed interface AccountsUIState {
 
 data class Account(
     val accountUid: String,
-    val mainAccountUid: String,
+    val mainWalletUid: String,
     val currency: String,
     val name: String,
 )

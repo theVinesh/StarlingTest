@@ -5,8 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
 import com.example.starlingtest.api.ApiFactory
-import com.example.starlingtest.ui.accounts.models.AccountsRepository
+import com.example.starlingtest.ui.accounts.data.AccountsRepository
 import com.example.starlingtest.ui.accounts.reducers.AccountsStateReducer
+import com.example.starlingtest.ui.accounts.states.Account
 import com.example.starlingtest.ui.accounts.states.AccountsState
 import com.example.starlingtest.ui.accounts.states.AccountsUIState
 import com.example.starlingtest.ui.accounts.usecases.RefreshAccountsUseCase
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 class AccountsScreenVm(
     private val repository: AccountsRepository = AccountsRepository(ApiFactory().createStarlingTestApi()),
     private val refreshAccountsUseCase: RefreshAccountsUseCase = RefreshAccountsUseCase(repository),
-    private val stateReducer: AccountsStateReducer = AccountsStateReducer()
+    private val stateReducer: AccountsStateReducer = AccountsStateReducer(),
+    private val onTap: (Account) -> Unit
 ) : ViewModel() {
     private val clientState = MutableStateFlow(
         value = AccountsState(
@@ -48,15 +50,18 @@ class AccountsScreenVm(
     @Suppress("UNCHECKED_CAST")
     companion object {
         fun create(
-            owner: ViewModelStoreOwner
+            owner: ViewModelStoreOwner,
+            onTap: (Account) -> Unit
         ) = ViewModelProvider(
             owner,
-            factory()
+            factory(onTap)
         )[AccountsScreenVm::class.java]
 
         private fun factory(
+            onTap: (Account) -> Unit
         ) = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T = AccountsScreenVm() as T
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                AccountsScreenVm(onTap = onTap) as T
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.starlingtest.ui.accounts.models
+package com.example.starlingtest.ui.accounts.data
 
 import com.example.starlingtest.api.StarlingApi
 

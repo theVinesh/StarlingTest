@@ -1,6 +1,6 @@
 package com.example.starlingtest.ui.accounts.usecases
 
-import com.example.starlingtest.ui.accounts.models.AccountsRepository
+import com.example.starlingtest.ui.accounts.data.AccountsRepository
 import com.example.starlingtest.ui.accounts.states.AccountsState
 import com.example.starlingtest.utils.networking.NetworkResponse
 import com.example.starlingtest.utils.networking.getErrorMessage
