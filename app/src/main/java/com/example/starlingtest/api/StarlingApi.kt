@@ -1,6 +1,7 @@
 package com.example.starlingtest.api
 
 import com.example.starlingtest.ui.accounts.models.AccountsResponse
+import com.example.starlingtest.ui.goals.models.SavingsResponse
 import com.example.starlingtest.ui.roundups.models.TransactionsResponse
 import com.example.starlingtest.utils.networking.NetworkResponse
 import retrofit2.http.GET
@@ -17,4 +18,9 @@ interface StarlingApi {
         @Path("categoryUid") mainWalletUid: String,
         @Query("changesSince", encoded = true) changesSince: String
     ): NetworkResponse<TransactionsResponse>
+
+    @GET("account/{accountUid}/savings-goals")
+    suspend fun fetchGoals(
+        @Path("accountUid") accountUid: String,
+    ): NetworkResponse<SavingsResponse>
 }
