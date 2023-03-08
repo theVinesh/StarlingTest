@@ -1,8 +1,10 @@
-@file:OptIn(ExperimentalMaterialApi::class)
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 
 package com.example.starlingtest.ui.roundups
 
 import android.widget.DatePicker
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +29,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -109,16 +112,11 @@ fun RoundupsScreen(
                         ctaText = "Change Date"
                     )
                     is RoundupsUiState.Content.Transactions -> Box {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                        ) {
-                            Button(onClick = {
-                                viewModel.showDatePicker(true)
-                            }) {
-                                Text(text = "Select Date")
-                            }
-                            TransactionsList(uiState.transactionsWithRoundUp.outboundTransactions)
-                        }
+                        TransactionsList(
+                            since = uiState.since!!,
+                            uiState.transactionsWithRoundUp.outboundTransactions,
+                            onChangeDate = { viewModel.showDatePicker(true) },
+                        )
                         RoundUpCard(
                             modifier = Modifier.align(
                                 Alignment.BottomCenter
@@ -155,9 +153,10 @@ fun RoundUpCard(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .padding(end = 8.dp),
+                enabled = roundUpTotal.amountInMinorUnits > 0,
                 onClick = { /*TODO*/ }
             ) {
-                Text(text = "Save")
+                Text(text = "Save to Goal")
             }
         }
 
@@ -193,12 +192,29 @@ fun DateSelector(
 
 @Composable
 fun TransactionsList(
-    transactions: List<Transaction>
+    since: LocalDate,
+    transactions: List<Transaction>,
+    onChangeDate: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 128.dp)
     ) {
+        stickyHeader {
+            ListItem(
+                modifier = Modifier.background(MaterialTheme.colors.secondaryVariant),
+                text = { Text(text = "Eligible transactions since $since") },
+                trailing = {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Change",
+                        modifier = Modifier.clickable(
+                            onClick = onChangeDate
+                        )
+                    )
+                }
+            )
+        }
         items(
             transactions.size,
             key = { index -> transactions[index].uid }
@@ -212,9 +228,9 @@ fun TransactionsList(
                     Column(
                         horizontalAlignment = Alignment.End
                     ) {
-                        Text(text = "${amount.valueString} ${amount.currency}")
+                        Text(text = "-${amount.valueString} ${amount.currency}")
                         Text(
-                            text = "(${roundUp.valueString} ${roundUp.currency})",
+                            text = "👛 ${roundUp.valueString} ${roundUp.currency}",
                             style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)
                         )
                     }
@@ -255,6 +271,7 @@ fun AccountsListPreview() {
             modifier = Modifier.fillMaxSize()
         ) {
             TransactionsList(
+                since = LocalDate.now(),
                 listOf(
                     Transaction(
                         uid = "1",
@@ -276,7 +293,8 @@ fun AccountsListPreview() {
                         amount = Amount(2, currency = "GBP"),
                         sentTo = "Adam"
                     )
-                )
+                ),
+                onChangeDate = {}
             )
         }
     }
