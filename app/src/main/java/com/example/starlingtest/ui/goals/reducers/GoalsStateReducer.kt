@@ -10,7 +10,7 @@ class GoalsStateReducer {
     fun computeUiState(state: GoalsState): GoalsUiState = when {
         state.error != null -> GoalsUiState.Error(state.error)
         state.isLoading -> GoalsUiState.Loading
-        state.goals.isEmpty() -> GoalsUiState.Content.NoGoals
+        state.goals.isEmpty() -> GoalsUiState.Content.NoGoals("GBP") // TODO change this
         else -> GoalsUiState.Content.Goals(
             state.goals.map {
                 Goal(

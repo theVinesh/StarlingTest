@@ -12,8 +12,8 @@ data class GoalsState(
 sealed interface GoalsUiState {
     object Loading : GoalsUiState
 
-    sealed class Content(val currencyCode: String = "") : GoalsUiState {
-        object NoGoals : Content()
+    sealed class Content(val currencyCode: String) : GoalsUiState {
+        class NoGoals(currencyCode: String) : Content(currencyCode)
         class Goals(val goals: List<Goal>, currencyCode: String) : Content(currencyCode)
     }
 

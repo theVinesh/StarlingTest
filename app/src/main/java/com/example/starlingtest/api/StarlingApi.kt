@@ -31,5 +31,5 @@ interface StarlingApi {
     suspend fun createGoal(
         @Path("accountUid") accountUid: String,
         @Body params: CreateGoalParams
-    ): NetworkResponse<Nothing>
+    ): NetworkResponse<Unit>
 }

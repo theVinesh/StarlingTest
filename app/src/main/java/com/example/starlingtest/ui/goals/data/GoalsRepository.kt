@@ -13,5 +13,5 @@ class GoalsRepository(private val api: StarlingApi) {
     suspend fun createGoal(
         accountUid: String,
         params: CreateGoalParams
-    ): NetworkResponse<Nothing> = api.createGoal(accountUid, params)
+    ): NetworkResponse<Unit> = api.createGoal(accountUid, params)
 }

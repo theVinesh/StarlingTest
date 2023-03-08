@@ -86,7 +86,7 @@ fun GoalsScreen(
                             viewModel.onTap(goal)
                         }
                     )
-                    GoalsUiState.Content.NoGoals -> ErrorScreen(
+                    is GoalsUiState.Content.NoGoals -> ErrorScreen(
                         message = "No goals found",
                         onClick = { viewModel.showCreateGoalDialog() },
                         ctaText = "Create a goal"
