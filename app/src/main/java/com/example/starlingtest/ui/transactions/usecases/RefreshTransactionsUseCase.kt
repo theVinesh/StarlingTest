@@ -6,18 +6,29 @@ import com.example.starlingtest.utils.networking.NetworkResponse
 import com.example.starlingtest.utils.networking.getErrorMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.Date
+import java.time.LocalDate
 
 class RefreshTransactionsUseCase(
     private val transactionsRepository: TransactionsRepository
 ) {
     suspend operator fun invoke(
         clientStateFlow: MutableStateFlow<TransactionsState>,
-        accountUid: String,
-        mainWalletUid: String,
-        since: Date
+        accountUid: String?,
+        mainWalletUid: String?,
+        since: LocalDate
     ) {
         val currentClientState = clientStateFlow.value
+
+        if (accountUid == null || mainWalletUid == null) {
+            clientStateFlow.update {
+                currentClientState.copy(
+                    transactions = emptyList(),
+                    error = "Invalid account or wallet id",
+                    isLoading = false
+                )
+            }
+            return
+        }
         // Show loading
         clientStateFlow.update {
             currentClientState.copy(

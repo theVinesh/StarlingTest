@@ -2,6 +2,7 @@
 
 package com.example.starlingtest.ui.accounts
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
@@ -47,7 +48,12 @@ fun AccountsScreen(
                 ctaText = "Retry"
             )
             is AccountsUIState.Content -> {
-                AccountsList(uiState)
+                AccountsList(
+                    uiState,
+                    onClick = { account ->
+                        viewModel.onTap(account)
+                    }
+                )
             }
         }
     }
@@ -55,21 +61,26 @@ fun AccountsScreen(
 
 @Composable
 fun AccountsList(
-    uiState: AccountsUIState.Content
+    uiState: AccountsUIState.Content,
+    onClick: (Account) -> Unit
 ) {
     LazyColumn {
         items(
             uiState.accounts.size,
             key = { index -> uiState.accounts[index].accountUid }
         ) { index ->
+            val account = uiState.accounts[index]
             ListItem(
-                overlineText = { Text(text = uiState.accounts[index].currency) },
-                text = { Text(text = uiState.accounts[index].name) },
+                overlineText = { Text(text = account.currency) },
+                text = { Text(text = account.name) },
                 trailing = {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowRight,
-                        contentDescription = "next"
+                        contentDescription = null
                     )
+                },
+                modifier = Modifier.clickable {
+                    onClick(account)
                 }
             )
             Divider()
@@ -112,7 +123,8 @@ fun AccountsListPreview() {
                             name = "Indian Rupee",
                         )
                     )
-                )
+                ),
+                onClick = {}
             )
         }
     }

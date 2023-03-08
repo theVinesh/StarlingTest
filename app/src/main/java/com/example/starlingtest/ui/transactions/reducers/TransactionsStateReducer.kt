@@ -1,10 +1,11 @@
 package com.example.starlingtest.ui.transactions.reducers
 
 import com.example.starlingtest.ui.transactions.models.Direction
+import com.example.starlingtest.ui.transactions.states.Amount
 import com.example.starlingtest.ui.transactions.states.Transaction
 import com.example.starlingtest.ui.transactions.states.TransactionsState
 import com.example.starlingtest.ui.transactions.states.TransactionsUIState
-import kotlin.math.ceil
+import com.example.starlingtest.ui.transactions.states.roundUp
 
 
 class TransactionsStateReducer {
@@ -21,20 +22,25 @@ class TransactionsStateReducer {
                 .filter { it.direction == Direction.OUT }
                 .map {
                     Transaction(
-                        it.uid,
-                        it.amount.inMinorUnits / 100.toDouble(),
-                        it.amount.inMinorUnits,
-                        it.amount.currency
+                        uid = it.uid,
+                        sentTo = it.counterPartyName,
+                        amount = Amount(it.amount.inMinorUnits, it.amount.currency)
                     )
                 }
-            val roundUpTotal = outboundTransactions.sumOf { ceil(it.amount) - it.amount }
-            val roundUpTotalInMinorUnits = (roundUpTotal * 100).toInt()
+            val roundUpTotal = outboundTransactions.fold(0f) { acc, transaction ->
+                acc + transaction.amount.roundUp().value
+            }
             TransactionsUIState.Content(
+                since = state.since,
                 outboundTransactions = outboundTransactions,
-                roundUpTotal = roundUpTotalInMinorUnits
+                roundUpTotal = Amount((roundUpTotal * 100).toInt(), "GBP") // TODO change this
             )
         } else {
-            TransactionsUIState.Error("No transactions found")
+            TransactionsUIState.Content(
+                since = null,
+                outboundTransactions = emptyList(),
+                roundUpTotal = Amount(0, "GBP") // TODO change this
+            )
         }
     }
 }

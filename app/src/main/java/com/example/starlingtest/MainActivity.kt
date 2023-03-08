@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.starlingtest.ui.navigation.Destination
 import com.example.starlingtest.ui.navigation.accountsDestination
+import com.example.starlingtest.ui.navigation.transactionsDestination
 import com.example.starlingtest.ui.theme.StarlingTestTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,7 +28,9 @@ class MainActivity : ComponentActivity() {
                     ) {
                         accountsDestination(
                             navController = navHostController,
-                            vmOwner = this@MainActivity
+                        )
+                        transactionsDestination(
+                            navController = navHostController,
                         )
                     }
                 }

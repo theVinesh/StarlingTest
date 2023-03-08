@@ -15,6 +15,6 @@ interface StarlingApi {
     suspend fun fetchTransactions(
         @Path("accountUid") accountUid: String,
         @Path("categoryUid") mainWalletUid: String,
-        @Query("changesSince") changesSince: String
+        @Query("changesSince", encoded = true) changesSince: String
     ): NetworkResponse<TransactionsResponse>
 }

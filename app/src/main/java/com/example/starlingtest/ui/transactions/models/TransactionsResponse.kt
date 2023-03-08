@@ -18,7 +18,9 @@ data class TransactionModel(
     @SerialName("direction")
     val direction: Direction = Direction.OUT,
     @SerialName("status")
-    val status: TransactionStatus = TransactionStatus.SETTLED
+    val status: TransactionStatus = TransactionStatus.SETTLED,
+    @SerialName("counterPartyName")
+    val counterPartyName: String = ""
 )
 
 @Serializable

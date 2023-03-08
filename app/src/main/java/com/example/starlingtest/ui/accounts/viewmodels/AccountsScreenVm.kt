@@ -22,7 +22,7 @@ class AccountsScreenVm(
     private val repository: AccountsRepository = AccountsRepository(ApiFactory().createStarlingTestApi()),
     private val refreshAccountsUseCase: RefreshAccountsUseCase = RefreshAccountsUseCase(repository),
     private val stateReducer: AccountsStateReducer = AccountsStateReducer(),
-    private val onTap: (Account) -> Unit
+    val onTap: (Account) -> Unit
 ) : ViewModel() {
     private val clientState = MutableStateFlow(
         value = AccountsState(

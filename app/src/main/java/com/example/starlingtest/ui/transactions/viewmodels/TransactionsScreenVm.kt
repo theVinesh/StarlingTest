@@ -7,20 +7,24 @@ import androidx.lifecycle.viewModelScope
 import com.example.starlingtest.api.ApiFactory
 import com.example.starlingtest.ui.transactions.data.TransactionsRepository
 import com.example.starlingtest.ui.transactions.reducers.TransactionsStateReducer
+import com.example.starlingtest.ui.transactions.states.TransactionScreenEffects
 import com.example.starlingtest.ui.transactions.states.TransactionsState
 import com.example.starlingtest.ui.transactions.states.TransactionsUIState
 import com.example.starlingtest.ui.transactions.usecases.RefreshTransactionsUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Date
+import java.time.LocalDate
 
 class TransactionsScreenVm(
-    private val accountUid: String,
-    private val mainWalletUid: String,
+    private val accountUid: String?,
+    private val mainWalletUid: String?,
     private val repository: TransactionsRepository = TransactionsRepository(ApiFactory().createStarlingTestApi()),
     private val refreshTransactionsUseCase: RefreshTransactionsUseCase = RefreshTransactionsUseCase(
         repository
@@ -31,7 +35,7 @@ class TransactionsScreenVm(
     private val clientState = MutableStateFlow(
         value = TransactionsState(
             transactions = emptyList(),
-            isLoading = true
+            isLoading = false
         )
     )
 
@@ -41,7 +45,10 @@ class TransactionsScreenVm(
         initialValue = TransactionsUIState.Loading
     )
 
-    fun fetchTransactions(since: Date) {
+    private val _effect = MutableSharedFlow<TransactionScreenEffects>()
+    val effect = _effect.shareIn(viewModelScope, SharingStarted.Eagerly)
+
+    fun fetchTransactions(since: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
             refreshTransactionsUseCase(
                 clientState,
@@ -52,12 +59,26 @@ class TransactionsScreenVm(
         }
     }
 
+    fun showDatePicker(show: Boolean) {
+        viewModelScope.launch {
+            _effect.emit(TransactionScreenEffects.ShowDatePicker(show))
+        }
+    }
+
+    fun onDateSelected(date: LocalDate) {
+        clientState.update {
+            it.copy(since = date)
+        }
+        showDatePicker(false)
+        fetchTransactions(date)
+    }
+
     @Suppress("UNCHECKED_CAST")
     companion object {
         fun create(
             owner: ViewModelStoreOwner,
-            accountUid: String,
-            mainWalletUid: String,
+            accountUid: String?,
+            mainWalletUid: String?,
             onRoundUp: (Int) -> Unit
         ) = ViewModelProvider(
             owner,
@@ -69,8 +90,8 @@ class TransactionsScreenVm(
         )[TransactionsScreenVm::class.java]
 
         private fun factory(
-            accountUid: String,
-            mainWalletUid: String,
+            accountUid: String?,
+            mainWalletUid: String?,
             onRoundUp: (Int) -> Unit
         ) = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
