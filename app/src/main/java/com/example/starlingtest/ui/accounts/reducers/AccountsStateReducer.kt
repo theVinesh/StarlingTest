@@ -6,7 +6,6 @@ import com.example.starlingtest.ui.accounts.states.AccountsUIState
 
 
 class AccountsStateReducer {
-
     fun computeUiState(state: AccountsState): AccountsUIState {
         if (state.error != null) {
             return AccountsUIState.Error(state.error)
