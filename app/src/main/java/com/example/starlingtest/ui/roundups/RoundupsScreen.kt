@@ -48,6 +48,7 @@ import com.example.starlingtest.ui.roundups.states.RoundupsScreenEffects
 import com.example.starlingtest.ui.roundups.states.RoundupsUiState
 import com.example.starlingtest.ui.roundups.states.Transaction
 import com.example.starlingtest.ui.roundups.states.roundUp
+import com.example.starlingtest.ui.roundups.states.toAmount
 import com.example.starlingtest.ui.roundups.viewmodels.RoundupsScreenVm
 import com.example.starlingtest.ui.theme.StarlingTestTheme
 import java.time.LocalDate
@@ -121,7 +122,12 @@ fun RoundupsScreen(
                             modifier = Modifier.align(
                                 Alignment.BottomCenter
                             ),
-                            roundUpTotal = uiState.transactionsWithRoundUp.roundUpTotal
+                            roundUpTotal = uiState.transactionsWithRoundUp.roundUpTotal,
+                            onClickSave = {
+                                viewModel.onRoundUp(
+                                    uiState.transactionsWithRoundUp.roundUpTotal
+                                )
+                            }
                         )
                     }
                 }
@@ -133,7 +139,8 @@ fun RoundupsScreen(
 @Composable
 fun RoundUpCard(
     modifier: Modifier = Modifier,
-    roundUpTotal: Amount
+    roundUpTotal: Amount,
+    onClickSave: () -> Unit,
 ) {
     Card(
         elevation = 16.dp,
@@ -147,14 +154,14 @@ fun RoundUpCard(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .padding(start = 8.dp),
-                text = "Round Up Total: ${roundUpTotal.valueString} ${roundUpTotal.currency}",
+                text = "Round Up Total: ${roundUpTotal.amountString} ${roundUpTotal.currency}",
             )
             Button(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .padding(end = 8.dp),
                 enabled = roundUpTotal.amountInMinorUnits > 0,
-                onClick = { /*TODO*/ }
+                onClick = onClickSave
             ) {
                 Text(text = "Save to Goal")
             }
@@ -224,14 +231,16 @@ fun TransactionsList(
                 text = { Text(text = "To ${transaction.sentTo}") },
                 trailing = {
                     val amount = transaction.amount
-                    val roundUp = amount.roundUp()
+                    val roundUp = amount.amountInMinorUnits.roundUp().toAmount(amount.currency)
                     Column(
                         horizontalAlignment = Alignment.End
                     ) {
-                        Text(text = "-${amount.valueString} ${amount.currency}")
+                        Text(text = "-${amount.amountString} ${amount.currency}")
                         Text(
-                            text = "👛 ${roundUp.valueString} ${roundUp.currency}",
-                            style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)
+                            text = "${roundUp.amountString} ${roundUp.currency}",
+                            style = MaterialTheme.typography.caption.copy(
+                                color = MaterialTheme.colors.secondary
+                            )
                         )
                     }
                 }
@@ -246,7 +255,8 @@ fun TransactionsList(
 fun RoundUpCardPreview() {
     StarlingTestTheme {
         RoundUpCard(
-            roundUpTotal = Amount(172, currency = "GBP")
+            roundUpTotal = Amount(172, currency = "GBP"),
+            onClickSave = {}
         )
     }
 }

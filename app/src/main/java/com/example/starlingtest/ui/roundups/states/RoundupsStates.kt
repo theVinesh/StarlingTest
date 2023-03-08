@@ -2,7 +2,6 @@ package com.example.starlingtest.ui.roundups.states
 
 import com.example.starlingtest.ui.roundups.models.TransactionModel
 import java.time.LocalDate
-import kotlin.math.ceil
 
 
 data class RoundupsState(
@@ -39,14 +38,15 @@ data class Transaction(
 )
 
 data class Amount(
-    val amountInMinorUnits: Int,
+    val amountInMinorUnits: Long,
     val currency: String,
 ) {
-    val value = amountInMinorUnits / 100.toFloat()
-    val valueString = String.format("%.2f", value)
+    private val amount = amountInMinorUnits / 100f
+    val amountString = String.format("%.2f", amount)
 }
 
-fun Amount.roundUp(): Amount {
-    val ceil = ceil(value)
-    return Amount(((ceil(value) - value) * 100).toInt(), currency)
+fun Long.roundUp(): Long {
+    val ceilAmountInMinorUnits = ((this + 100) / 100) * 100
+    return ceilAmountInMinorUnits - this
 }
+fun Long.toAmount(currency: String) = Amount(this, currency)

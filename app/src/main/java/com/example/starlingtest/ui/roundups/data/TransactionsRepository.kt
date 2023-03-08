@@ -7,7 +7,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class TransactionsRepository(private val api: StarlingApi) {
-
     suspend fun fetchTransactions(
         accountUid: String,
         mainWalletUid: String,

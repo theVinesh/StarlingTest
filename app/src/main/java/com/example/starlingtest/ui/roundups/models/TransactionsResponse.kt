@@ -28,7 +28,7 @@ data class AmountModel(
     @SerialName("currency")
     val currency: String = "",
     @SerialName("minorUnits")
-    val inMinorUnits: Int = 0
+    val inMinorUnits: Long = 0
 )
 
 @Serializable
