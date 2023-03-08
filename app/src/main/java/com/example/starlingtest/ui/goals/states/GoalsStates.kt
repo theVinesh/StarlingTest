@@ -12,14 +12,28 @@ data class GoalsState(
 sealed interface GoalsUiState {
     object Loading : GoalsUiState
 
-    sealed interface Content : GoalsUiState {
-        object NoGoals : Content
-        data class Goals(val goals: List<Goal>) : Content
+    sealed class Content(val currencyCode: String = "") : GoalsUiState {
+        object NoGoals : Content()
+        class Goals(val goals: List<Goal>, currencyCode: String) : Content(currencyCode)
     }
 
     data class Error(val message: String) : GoalsUiState
 }
 
+data class CreateGoalDialogState(
+    val isShown: Boolean = false,
+    val error: String? = null,
+    val isLoading: Boolean = false,
+)
+
+sealed interface CreateGoalDialogUiState {
+    object Hidden : CreateGoalDialogUiState
+
+    data class Shown(
+        val error: String? = null,
+        val isLoading: Boolean = false
+    ) : CreateGoalDialogUiState
+}
 
 data class Goal(
     val uid: String,

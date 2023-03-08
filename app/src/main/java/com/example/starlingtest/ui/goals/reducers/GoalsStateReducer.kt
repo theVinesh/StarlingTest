@@ -18,7 +18,8 @@ class GoalsStateReducer {
                     it.name,
                     Amount(it.savings.inMinorUnits, it.savings.currency)
                 )
-            }
+            },
+            "GBP" // TODO change this
         )
     }
 }
