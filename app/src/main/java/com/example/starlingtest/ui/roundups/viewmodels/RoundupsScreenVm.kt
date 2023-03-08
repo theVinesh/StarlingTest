@@ -1,16 +1,16 @@
-package com.example.starlingtest.ui.transactions.viewmodels
+package com.example.starlingtest.ui.roundups.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
 import com.example.starlingtest.api.ApiFactory
-import com.example.starlingtest.ui.transactions.data.TransactionsRepository
-import com.example.starlingtest.ui.transactions.reducers.TransactionsStateReducer
-import com.example.starlingtest.ui.transactions.states.TransactionScreenEffects
-import com.example.starlingtest.ui.transactions.states.TransactionsState
-import com.example.starlingtest.ui.transactions.states.TransactionsUIState
-import com.example.starlingtest.ui.transactions.usecases.RefreshTransactionsUseCase
+import com.example.starlingtest.ui.roundups.data.TransactionsRepository
+import com.example.starlingtest.ui.roundups.reducers.RoundupsStateReducer
+import com.example.starlingtest.ui.roundups.states.RoundupsScreenEffects
+import com.example.starlingtest.ui.roundups.states.RoundupsState
+import com.example.starlingtest.ui.roundups.states.RoundupsUiState
+import com.example.starlingtest.ui.roundups.usecases.RefreshTransactionsUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,18 +22,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class TransactionsScreenVm(
+class RoundupsScreenVm(
     private val accountUid: String?,
     private val mainWalletUid: String?,
     private val repository: TransactionsRepository = TransactionsRepository(ApiFactory().createStarlingTestApi()),
     private val refreshTransactionsUseCase: RefreshTransactionsUseCase = RefreshTransactionsUseCase(
         repository
     ),
-    private val stateReducer: TransactionsStateReducer = TransactionsStateReducer(),
+    private val stateReducer: RoundupsStateReducer = RoundupsStateReducer(),
     private val onRoundUp: (Int) -> Unit
 ) : ViewModel() {
     private val clientState = MutableStateFlow(
-        value = TransactionsState(
+        value = RoundupsState(
             transactions = emptyList(),
             isLoading = false
         )
@@ -42,10 +42,10 @@ class TransactionsScreenVm(
     val uiState = clientState.map(stateReducer::computeUiState).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = TransactionsUIState.Loading
+        initialValue = RoundupsUiState.Loading
     )
 
-    private val _effect = MutableSharedFlow<TransactionScreenEffects>()
+    private val _effect = MutableSharedFlow<RoundupsScreenEffects>()
     val effect = _effect.shareIn(viewModelScope, SharingStarted.Eagerly)
 
     fun fetchTransactions(since: LocalDate) {
@@ -61,7 +61,7 @@ class TransactionsScreenVm(
 
     fun showDatePicker(show: Boolean) {
         viewModelScope.launch {
-            _effect.emit(TransactionScreenEffects.ShowDatePicker(show))
+            _effect.emit(RoundupsScreenEffects.ShowDatePicker(show))
         }
     }
 
@@ -87,7 +87,7 @@ class TransactionsScreenVm(
                 mainWalletUid = mainWalletUid,
                 onRoundUp = onRoundUp
             )
-        )[TransactionsScreenVm::class.java]
+        )[RoundupsScreenVm::class.java]
 
         private fun factory(
             accountUid: String?,
@@ -95,7 +95,7 @@ class TransactionsScreenVm(
             onRoundUp: (Int) -> Unit
         ) = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                TransactionsScreenVm(
+                RoundupsScreenVm(
                     accountUid = accountUid,
                     mainWalletUid = mainWalletUid,
                     onRoundUp = onRoundUp

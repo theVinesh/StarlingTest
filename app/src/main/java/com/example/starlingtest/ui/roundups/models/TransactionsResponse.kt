@@ -1,4 +1,4 @@
-package com.example.starlingtest.ui.transactions.models
+package com.example.starlingtest.ui.roundups.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

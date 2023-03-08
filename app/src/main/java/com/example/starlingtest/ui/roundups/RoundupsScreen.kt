@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterialApi::class)
 
-package com.example.starlingtest.ui.transactions
+package com.example.starlingtest.ui.roundups
 
 import android.widget.DatePicker
 import androidx.compose.foundation.clickable
@@ -40,19 +40,19 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import com.example.starlingtest.ui.ErrorScreen
 import com.example.starlingtest.ui.LoadingScreen
+import com.example.starlingtest.ui.roundups.states.Amount
+import com.example.starlingtest.ui.roundups.states.RoundupsScreenEffects
+import com.example.starlingtest.ui.roundups.states.RoundupsUiState
+import com.example.starlingtest.ui.roundups.states.Transaction
+import com.example.starlingtest.ui.roundups.states.roundUp
+import com.example.starlingtest.ui.roundups.viewmodels.RoundupsScreenVm
 import com.example.starlingtest.ui.theme.StarlingTestTheme
-import com.example.starlingtest.ui.transactions.states.Amount
-import com.example.starlingtest.ui.transactions.states.Transaction
-import com.example.starlingtest.ui.transactions.states.TransactionScreenEffects
-import com.example.starlingtest.ui.transactions.states.TransactionsUIState
-import com.example.starlingtest.ui.transactions.states.roundUp
-import com.example.starlingtest.ui.transactions.viewmodels.TransactionsScreenVm
 import java.time.LocalDate
 import java.time.ZoneId
 
 @Composable
-fun TransactionsScreen(
-    viewModel: TransactionsScreenVm,
+fun RoundupsScreen(
+    viewModel: RoundupsScreenVm,
     onBack: () -> Unit
 ) {
     val state = viewModel.uiState.collectAsState()
@@ -63,7 +63,7 @@ fun TransactionsScreen(
         block = {
             viewModel.effect.collect {
                 when (it) {
-                    is TransactionScreenEffects.ShowDatePicker -> showDatePicker.value = it.show
+                    is RoundupsScreenEffects.ShowDatePicker -> showDatePicker.value = it.show
                 }
             }
         }
@@ -84,37 +84,48 @@ fun TransactionsScreen(
         }
     ) {
         it.calculateBottomPadding()
-
         when (val uiState = state.value) {
-            is TransactionsUIState.Loading -> LoadingScreen()
-            is TransactionsUIState.Error -> ErrorScreen(
+            is RoundupsUiState.Loading -> LoadingScreen()
+            is RoundupsUiState.Error -> ErrorScreen(
                 message = uiState.message,
                 onClick = onBack,
                 ctaText = "Go Back"
             )
-            is TransactionsUIState.Content -> {
+            is RoundupsUiState.Content -> {
                 DateSelector(
                     show = showDatePicker.value,
                     dateToShow = uiState.since,
                     onDateSelected = viewModel::onDateSelected
                 )
-                Box {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        Button(onClick = {
-                            viewModel.showDatePicker(true)
-                        }) {
-                            Text(text = "Select Date")
-                        }
-                        TransactionsList(uiState)
-                    }
-                    RoundUpCard(
-                        modifier = Modifier.align(
-                            Alignment.BottomCenter
-                        ),
-                        roundUpTotal = uiState.roundUpTotal
+                when (uiState) {
+                    is RoundupsUiState.Content.Initial -> ErrorScreen(
+                        message = "Select a date to get started",
+                        onClick = { viewModel.showDatePicker(true) },
+                        ctaText = "Select Date"
                     )
+                    is RoundupsUiState.Content.NoTransactions -> ErrorScreen(
+                        message = "No transactions found for the selected date",
+                        onClick = { viewModel.showDatePicker(true) },
+                        ctaText = "Change Date"
+                    )
+                    is RoundupsUiState.Content.Transactions -> Box {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            Button(onClick = {
+                                viewModel.showDatePicker(true)
+                            }) {
+                                Text(text = "Select Date")
+                            }
+                            TransactionsList(uiState.transactionsWithRoundUp.outboundTransactions)
+                        }
+                        RoundUpCard(
+                            modifier = Modifier.align(
+                                Alignment.BottomCenter
+                            ),
+                            roundUpTotal = uiState.transactionsWithRoundUp.roundUpTotal
+                        )
+                    }
                 }
             }
         }
@@ -182,17 +193,17 @@ fun DateSelector(
 
 @Composable
 fun TransactionsList(
-    uiState: TransactionsUIState.Content
+    transactions: List<Transaction>
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 128.dp)
     ) {
         items(
-            uiState.outboundTransactions.size,
-            key = { index -> uiState.outboundTransactions[index].uid }
+            transactions.size,
+            key = { index -> transactions[index].uid }
         ) { index ->
-            val transaction = uiState.outboundTransactions[index]
+            val transaction = transactions[index]
             ListItem(
                 text = { Text(text = "To ${transaction.sentTo}") },
                 trailing = {
@@ -244,31 +255,27 @@ fun AccountsListPreview() {
             modifier = Modifier.fillMaxSize()
         ) {
             TransactionsList(
-                uiState = TransactionsUIState.Content(
-                    outboundTransactions = listOf(
-                        Transaction(
-                            uid = "1",
-                            amount = Amount(1720, currency = "GBP"),
-                            sentTo = "John"
-                        ),
-                        Transaction(
-                            uid = "2",
-                            amount = Amount(182, currency = "GBP"),
-                            sentTo = "Jane"
-                        ),
-                        Transaction(
-                            uid = "3",
-                            amount = Amount(82, currency = "GBP"),
-                            sentTo = "Mary"
-                        ),
-                        Transaction(
-                            uid = "4",
-                            amount = Amount(2, currency = "GBP"),
-                            sentTo = "Adam"
-                        )
+                listOf(
+                    Transaction(
+                        uid = "1",
+                        amount = Amount(1720, currency = "GBP"),
+                        sentTo = "John"
                     ),
-                    roundUpTotal = Amount(214, currency = "GBP"),
-                    since = LocalDate.now()
+                    Transaction(
+                        uid = "2",
+                        amount = Amount(182, currency = "GBP"),
+                        sentTo = "Jane"
+                    ),
+                    Transaction(
+                        uid = "3",
+                        amount = Amount(82, currency = "GBP"),
+                        sentTo = "Mary"
+                    ),
+                    Transaction(
+                        uid = "4",
+                        amount = Amount(2, currency = "GBP"),
+                        sentTo = "Adam"
+                    )
                 )
             )
         }

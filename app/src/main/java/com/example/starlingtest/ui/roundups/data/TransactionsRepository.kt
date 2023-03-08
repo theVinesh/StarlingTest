@@ -1,7 +1,7 @@
-package com.example.starlingtest.ui.transactions.data
+package com.example.starlingtest.ui.roundups.data
 
 import com.example.starlingtest.api.StarlingApi
-import com.example.starlingtest.ui.transactions.models.TransactionsResponse
+import com.example.starlingtest.ui.roundups.models.TransactionsResponse
 import com.example.starlingtest.utils.networking.NetworkResponse
 import java.time.LocalDate
 import java.time.LocalTime

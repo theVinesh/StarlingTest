@@ -1,7 +1,7 @@
-package com.example.starlingtest.ui.transactions.usecases
+package com.example.starlingtest.ui.roundups.usecases
 
-import com.example.starlingtest.ui.transactions.data.TransactionsRepository
-import com.example.starlingtest.ui.transactions.states.TransactionsState
+import com.example.starlingtest.ui.roundups.data.TransactionsRepository
+import com.example.starlingtest.ui.roundups.states.RoundupsState
 import com.example.starlingtest.utils.networking.NetworkResponse
 import com.example.starlingtest.utils.networking.getErrorMessage
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +12,7 @@ class RefreshTransactionsUseCase(
     private val transactionsRepository: TransactionsRepository
 ) {
     suspend operator fun invoke(
-        clientStateFlow: MutableStateFlow<TransactionsState>,
+        clientStateFlow: MutableStateFlow<RoundupsState>,
         accountUid: String?,
         mainWalletUid: String?,
         since: LocalDate
