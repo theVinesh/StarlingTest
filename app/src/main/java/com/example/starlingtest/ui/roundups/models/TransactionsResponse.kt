@@ -43,5 +43,7 @@ enum class Direction {
 @Serializable
 enum class TransactionStatus {
     @SerialName("SETTLED")
-    SETTLED
+    SETTLED,
+    @SerialName("PENDING")
+    PENDING
 }
