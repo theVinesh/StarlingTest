@@ -1,6 +1,8 @@
 package com.example.starlingtest.ui.roundups.states
 
+import android.os.Parcelable
 import com.example.starlingtest.ui.roundups.models.TransactionModel
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
 
@@ -37,16 +39,19 @@ data class Transaction(
     val amount: Amount
 )
 
+@Parcelize
 data class Amount(
     val amountInMinorUnits: Long,
     val currency: String,
-) {
-    private val amount = amountInMinorUnits / 100f
-    val amountString = String.format("%.2f", amount)
+) : Parcelable {
+    override fun toString() = "${String.format("%.2f", amountInMinorUnits / 100f)} $currency"
+
 }
+
 
 fun Long.roundUp(): Long {
     val ceilAmountInMinorUnits = ((this + 100) / 100) * 100
     return ceilAmountInMinorUnits - this
 }
+
 fun Long.toAmount(currency: String) = Amount(this, currency)

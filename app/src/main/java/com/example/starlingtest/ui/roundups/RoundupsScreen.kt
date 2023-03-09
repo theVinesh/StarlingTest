@@ -154,7 +154,7 @@ fun RoundUpCard(
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .padding(start = 8.dp),
-                text = "Round Up Total: ${roundUpTotal.amountString} ${roundUpTotal.currency}",
+                text = "Round Up Total: $roundUpTotal",
             )
             Button(
                 modifier = Modifier
@@ -235,9 +235,9 @@ fun TransactionsList(
                     Column(
                         horizontalAlignment = Alignment.End
                     ) {
-                        Text(text = "-${amount.amountString} ${amount.currency}")
+                        Text(text = "-$amount")
                         Text(
-                            text = "${roundUp.amountString} ${roundUp.currency}",
+                            text = "$roundUp",
                             style = MaterialTheme.typography.caption.copy(
                                 color = MaterialTheme.colors.secondary
                             )

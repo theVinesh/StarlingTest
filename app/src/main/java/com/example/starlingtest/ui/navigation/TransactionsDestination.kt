@@ -34,7 +34,10 @@ fun NavGraphBuilder.transactionsDestination(
             mainWalletUid = mainWalletUid,
             onRoundUp = { amount ->
                 navController.navigate(
-                    "${Destination.GOALS.name}/$accountUid" // TODO send amount
+                    route = getGoalsRoute(
+                        accountUid = accountUid!!,
+                        amount = amount
+                    )
                 )
             }
         )

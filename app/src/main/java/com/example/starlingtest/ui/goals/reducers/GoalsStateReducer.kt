@@ -7,10 +7,10 @@ import com.example.starlingtest.ui.roundups.states.Amount
 
 
 class GoalsStateReducer {
-    fun computeUiState(state: GoalsState): GoalsUiState = when {
+    fun computeUiState(state: GoalsState, roundUpToTransfer: Amount?): GoalsUiState = when {
         state.error != null -> GoalsUiState.Error(state.error)
         state.isLoading -> GoalsUiState.Loading
-        state.goals.isEmpty() -> GoalsUiState.Content.NoGoals("GBP") // TODO change this
+        state.goals.isEmpty() -> GoalsUiState.Content.NoGoals(roundUpToTransfer)
         else -> GoalsUiState.Content.Goals(
             state.goals.map {
                 Goal(
@@ -19,7 +19,7 @@ class GoalsStateReducer {
                     Amount(it.savings.inMinorUnits, it.savings.currency)
                 )
             },
-            "GBP" // TODO change this
+            roundUpToTransfer
         )
     }
 }

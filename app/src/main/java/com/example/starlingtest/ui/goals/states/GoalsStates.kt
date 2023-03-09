@@ -12,9 +12,10 @@ data class GoalsState(
 sealed interface GoalsUiState {
     object Loading : GoalsUiState
 
-    sealed class Content(val currencyCode: String) : GoalsUiState {
-        class NoGoals(currencyCode: String) : Content(currencyCode)
-        class Goals(val goals: List<Goal>, currencyCode: String) : Content(currencyCode)
+    sealed class Content(val roundUpToTransfer: Amount?) : GoalsUiState {
+        class NoGoals(roundUpToTransfer: Amount?) : Content(roundUpToTransfer)
+        class Goals(val goals: List<Goal>,  roundUpToTransfer: Amount?) :
+            Content(roundUpToTransfer)
     }
 
     data class Error(val message: String) : GoalsUiState
