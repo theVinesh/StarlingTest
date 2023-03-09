@@ -1,6 +1,6 @@
 package com.example.starlingtest.ui.navigation
 
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -25,26 +25,22 @@ fun NavGraphBuilder.transactionsDestination(
             }
         )
     ) {
-        val vmStoreOwner = LocalViewModelStoreOwner.current!!
-        val accountUid = it.arguments?.getString(KEY_ACCOUNT_ID)
-        val mainWalletUid = it.arguments?.getString(KEY_WALLET_ID)
-        val vm = RoundupsScreenVm.create(
-            owner = vmStoreOwner,
-            accountUid = accountUid,
-            mainWalletUid = mainWalletUid,
-            onRoundUp = { amount ->
-                navController.navigate(
-                    route = getGoalsRoute(
-                        accountUid = accountUid!!,
-                        amount = amount
-                    )
-                )
-            }
-        )
+        val vm = hiltViewModel<RoundupsScreenVm>().apply {
+            accountUid = it.arguments?.getString(KEY_ACCOUNT_ID)
+            mainWalletUid = it.arguments?.getString(KEY_WALLET_ID)
+        }
         RoundupsScreen(
             viewModel = vm,
             onBack = {
                 navController.navigateUp()
+            },
+            onRoundUp = { amount ->
+                navController.navigate(
+                    route = getGoalsRoute(
+                        accountUid = vm.accountUid!!,
+                        amount = amount
+                    )
+                )
             }
         )
     }

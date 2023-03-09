@@ -4,9 +4,10 @@ import com.example.starlingtest.ui.goals.states.Goal
 import com.example.starlingtest.ui.goals.states.GoalsState
 import com.example.starlingtest.ui.goals.states.GoalsUiState
 import com.example.starlingtest.ui.roundups.states.Amount
+import javax.inject.Inject
 
 
-class GoalsStateReducer {
+class GoalsStateReducer @Inject constructor() {
     fun computeUiState(state: GoalsState, roundUpToTransfer: Amount?): GoalsUiState = when {
         state.error != null -> GoalsUiState.Error(state.error)
         state.isLoading -> GoalsUiState.Loading

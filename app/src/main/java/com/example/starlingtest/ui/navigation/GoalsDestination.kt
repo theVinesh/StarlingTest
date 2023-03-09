@@ -1,6 +1,6 @@
 package com.example.starlingtest.ui.navigation
 
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -36,16 +36,12 @@ fun NavGraphBuilder.goalsDestination(
             }
         )
     ) {
-        val vmStoreOwner = LocalViewModelStoreOwner.current!!
         val amount = it.arguments?.getLong(KEY_AMOUNT, 0L)
         val currency = it.arguments?.getString(KEY_CURRENCY)
-        val roundUpToTransfer = currency?.let { currencyCode -> Amount(amount!!, currencyCode) }
-        val accountUid = it.arguments?.getString(KEY_ACCOUNT_ID)
-        val vm = GoalsScreenVm.create(
-            owner = vmStoreOwner,
-            accountUid = accountUid,
-            roundUpToTransfer = roundUpToTransfer
-        )
+        val vm = hiltViewModel<GoalsScreenVm>().apply {
+            accountUid = it.arguments?.getString(KEY_ACCOUNT_ID)
+            roundUpToTransfer = currency?.let { currencyCode -> Amount(amount!!, currencyCode) }
+        }
         GoalsScreen(
             viewModel = vm,
             onBack = {

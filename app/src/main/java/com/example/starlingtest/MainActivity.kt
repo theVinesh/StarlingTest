@@ -13,8 +13,11 @@ import com.example.starlingtest.ui.navigation.accountsDestination
 import com.example.starlingtest.ui.navigation.goalsDestination
 import com.example.starlingtest.ui.navigation.transactionsDestination
 import com.example.starlingtest.ui.theme.StarlingTestTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -28,13 +31,13 @@ class MainActivity : ComponentActivity() {
                         startDestination = Destination.ACCOUNTS.name
                     ) {
                         accountsDestination(
-                            navController = navHostController,
+                            navController = navHostController
                         )
                         transactionsDestination(
-                            navController = navHostController,
+                            navController = navHostController
                         )
                         goalsDestination(
-                            navController = navHostController,
+                            navController = navHostController
                         )
                     }
                 }

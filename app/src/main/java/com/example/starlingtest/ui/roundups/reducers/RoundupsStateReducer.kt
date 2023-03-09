@@ -10,9 +10,10 @@ import com.example.starlingtest.ui.roundups.states.RoundupsUiState
 import com.example.starlingtest.ui.roundups.states.Transaction
 import com.example.starlingtest.ui.roundups.states.roundUp
 import com.example.starlingtest.ui.roundups.states.toAmount
+import javax.inject.Inject
 
 
-class RoundupsStateReducer {
+class RoundupsStateReducer @Inject constructor() {
     fun computeUiState(state: RoundupsState): RoundupsUiState = when {
         state.error != null -> RoundupsUiState.Error(state.error)
         state.since == null -> RoundupsUiState.Content.Initial

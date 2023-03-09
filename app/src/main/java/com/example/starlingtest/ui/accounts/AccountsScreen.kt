@@ -28,7 +28,8 @@ import com.example.starlingtest.ui.theme.StarlingTestTheme
 
 @Composable
 fun AccountsScreen(
-    viewModel: AccountsScreenVm
+    viewModel: AccountsScreenVm,
+    onTapAccount: (Account) -> Unit
 ) {
     val state = viewModel.uiState.collectAsState()
 
@@ -50,9 +51,7 @@ fun AccountsScreen(
             is AccountsUIState.Content -> {
                 AccountsList(
                     uiState,
-                    onClick = { account ->
-                        viewModel.onTap(account)
-                    }
+                    onClick = onTapAccount
                 )
             }
         }

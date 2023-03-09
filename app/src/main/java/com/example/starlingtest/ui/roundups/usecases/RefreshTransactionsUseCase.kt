@@ -7,8 +7,9 @@ import com.example.starlingtest.utils.networking.getErrorMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
+import javax.inject.Inject
 
-class RefreshTransactionsUseCase(
+class RefreshTransactionsUseCase @Inject constructor(
     private val transactionsRepository: TransactionsRepository
 ) {
     suspend operator fun invoke(

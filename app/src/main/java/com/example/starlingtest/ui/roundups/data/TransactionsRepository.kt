@@ -5,8 +5,9 @@ import com.example.starlingtest.ui.roundups.models.TransactionsResponse
 import com.example.starlingtest.utils.networking.NetworkResponse
 import java.time.LocalDate
 import java.time.LocalTime
+import javax.inject.Inject
 
-class TransactionsRepository(private val api: StarlingApi) {
+class TransactionsRepository @Inject constructor(private val api: StarlingApi) {
     suspend fun fetchTransactions(
         accountUid: String,
         mainWalletUid: String,
