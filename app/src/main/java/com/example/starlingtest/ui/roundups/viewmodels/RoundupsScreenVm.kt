@@ -2,16 +2,15 @@ package com.example.starlingtest.ui.roundups.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
-import com.example.starlingtest.api.ApiFactory
-import com.example.starlingtest.ui.roundups.data.TransactionsRepository
 import com.example.starlingtest.ui.roundups.reducers.RoundupsStateReducer
-import com.example.starlingtest.ui.roundups.states.Amount
 import com.example.starlingtest.ui.roundups.states.RoundupsScreenEffects
 import com.example.starlingtest.ui.roundups.states.RoundupsState
 import com.example.starlingtest.ui.roundups.states.RoundupsUiState
 import com.example.starlingtest.ui.roundups.usecases.RefreshTransactionsUseCase
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,15 +22,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class RoundupsScreenVm(
-    private val accountUid: String?,
-    private val mainWalletUid: String?,
-    private val repository: TransactionsRepository = TransactionsRepository(ApiFactory().createStarlingTestApi()),
-    private val refreshTransactionsUseCase: RefreshTransactionsUseCase = RefreshTransactionsUseCase(
-        repository
-    ),
-    private val stateReducer: RoundupsStateReducer = RoundupsStateReducer(),
-    val onRoundUp: (Amount) -> Unit
+class RoundupsScreenVm @AssistedInject constructor(
+    @Assisted("accountUid") private val accountUid: String?,
+    @Assisted("mainWalletUid") private val mainWalletUid: String?,
+    private val refreshTransactionsUseCase: RefreshTransactionsUseCase,
+    private val stateReducer: RoundupsStateReducer,
 ) : ViewModel() {
     private val clientState = MutableStateFlow(
         value = RoundupsState(
@@ -74,33 +69,23 @@ class RoundupsScreenVm(
         fetchTransactions(date)
     }
 
+    @AssistedFactory
+    interface RoundupsScreenVmAssistedFactory {
+        fun create(
+            @Assisted("accountUid") accountUid: String?,
+            @Assisted("mainWalletUid") mainWalletUid: String?,
+        ): RoundupsScreenVm
+    }
+
     @Suppress("UNCHECKED_CAST")
     companion object {
-        fun create(
-            owner: ViewModelStoreOwner,
+        fun factory(
+            assistedFactory: RoundupsScreenVmAssistedFactory,
             accountUid: String?,
             mainWalletUid: String?,
-            onRoundUp: (Amount) -> Unit
-        ) = ViewModelProvider(
-            owner,
-            factory(
-                accountUid = accountUid,
-                mainWalletUid = mainWalletUid,
-                onRoundUp = onRoundUp
-            )
-        )[RoundupsScreenVm::class.java]
-
-        private fun factory(
-            accountUid: String?,
-            mainWalletUid: String?,
-            onRoundUp: (Amount) -> Unit
         ) = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                RoundupsScreenVm(
-                    accountUid = accountUid,
-                    mainWalletUid = mainWalletUid,
-                    onRoundUp = onRoundUp
-                ) as T
+                assistedFactory.create(accountUid, mainWalletUid) as T
         }
     }
 }

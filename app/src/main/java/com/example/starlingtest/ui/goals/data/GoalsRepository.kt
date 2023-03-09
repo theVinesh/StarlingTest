@@ -8,8 +8,9 @@ import com.example.starlingtest.ui.roundups.models.AmountModel
 import com.example.starlingtest.ui.roundups.states.Amount
 import com.example.starlingtest.utils.generateUUID
 import com.example.starlingtest.utils.networking.NetworkResponse
+import javax.inject.Inject
 
-class GoalsRepository(private val api: StarlingApi) {
+class GoalsRepository @Inject constructor(private val api: StarlingApi) {
     suspend fun fetchGoals(
         accountUid: String
     ): NetworkResponse<SavingsResponse> = api.fetchGoals(accountUid)

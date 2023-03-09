@@ -2,10 +2,7 @@ package com.example.starlingtest.ui.goals.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
-import com.example.starlingtest.api.ApiFactory
-import com.example.starlingtest.ui.goals.data.GoalsRepository
 import com.example.starlingtest.ui.goals.models.CreateGoalParams
 import com.example.starlingtest.ui.goals.reducers.CreateGoalDialogStateReducer
 import com.example.starlingtest.ui.goals.reducers.GoalsStateReducer
@@ -19,6 +16,9 @@ import com.example.starlingtest.ui.goals.usecases.CreateGoalUseCase
 import com.example.starlingtest.ui.goals.usecases.RefreshGoalsUseCase
 import com.example.starlingtest.ui.goals.usecases.TransferToGoalUseCase
 import com.example.starlingtest.ui.roundups.states.Amount
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,15 +29,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class GoalsScreenVm(
-    private val accountUid: String?,
-    private val roundUpToTransfer: Amount?,
-    private val repository: GoalsRepository = GoalsRepository(ApiFactory().createStarlingTestApi()),
-    private val refreshGoalsUseCase: RefreshGoalsUseCase = RefreshGoalsUseCase(repository),
-    private val createGoalUseCase: CreateGoalUseCase = CreateGoalUseCase(repository),
-    private val transferToGoalUseCase: TransferToGoalUseCase = TransferToGoalUseCase(repository),
-    private val goalsStateReducer: GoalsStateReducer = GoalsStateReducer(),
-    private val dialogStateReducer: CreateGoalDialogStateReducer = CreateGoalDialogStateReducer(),
+class GoalsScreenVm @AssistedInject constructor(
+    @Assisted private val accountUid: String?,
+    @Assisted private val roundUpToTransfer: Amount?,
+    private val refreshGoalsUseCase: RefreshGoalsUseCase,
+    private val createGoalUseCase: CreateGoalUseCase,
+    private val transferToGoalUseCase: TransferToGoalUseCase,
+    private val goalsStateReducer: GoalsStateReducer,
+    private val dialogStateReducer: CreateGoalDialogStateReducer,
 ) : ViewModel() {
     private val clientState = MutableStateFlow(
         value = GoalsState(
@@ -133,23 +132,23 @@ class GoalsScreenVm(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    companion object {
+    @AssistedFactory
+    interface GoalsScreenVmAssistedFactory {
         fun create(
-            owner: ViewModelStoreOwner,
             accountUid: String?,
             roundUpToTransfer: Amount?
-        ) = ViewModelProvider(
-            owner,
-            factory(accountUid, roundUpToTransfer)
-        )[GoalsScreenVm::class.java]
+        ): GoalsScreenVm
+    }
 
-        private fun factory(
+    @Suppress("UNCHECKED_CAST")
+    companion object {
+        fun factory(
+            assistedFactory: GoalsScreenVmAssistedFactory,
             accountUid: String?,
             roundUpToTransfer: Amount?
         ) = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                GoalsScreenVm(accountUid, roundUpToTransfer) as T
+                assistedFactory.create(accountUid, roundUpToTransfer) as T
         }
     }
 }

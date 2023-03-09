@@ -57,7 +57,8 @@ import java.time.ZoneId
 @Composable
 fun RoundupsScreen(
     viewModel: RoundupsScreenVm,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onRoundUp: (Amount) -> Unit
 ) {
     val state = viewModel.uiState.collectAsState()
     val showDatePicker = remember { mutableStateOf(false) }
@@ -124,7 +125,7 @@ fun RoundupsScreen(
                             ),
                             roundUpTotal = uiState.transactionsWithRoundUp.roundUpTotal,
                             onClickSave = {
-                                viewModel.onRoundUp(
+                                onRoundUp(
                                     uiState.transactionsWithRoundUp.roundUpTotal
                                 )
                             }

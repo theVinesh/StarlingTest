@@ -7,8 +7,9 @@ import com.example.starlingtest.utils.networking.NetworkResponse
 import com.example.starlingtest.utils.networking.getErrorMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class CreateGoalUseCase(
+class CreateGoalUseCase @Inject constructor(
     private val goalsRepository: GoalsRepository,
 ) {
     suspend operator fun invoke(
