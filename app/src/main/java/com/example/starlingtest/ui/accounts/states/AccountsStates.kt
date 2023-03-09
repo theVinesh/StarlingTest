@@ -2,7 +2,6 @@ package com.example.starlingtest.ui.accounts.states
 
 import com.example.starlingtest.ui.accounts.models.AccountModel
 
-
 data class AccountsState(
     val accounts: List<AccountModel> = emptyList(),
     val error: String? = null,

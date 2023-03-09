@@ -9,6 +9,7 @@ import com.example.starlingtest.ui.roundups.states.RoundupsState
 import com.example.starlingtest.ui.roundups.states.RoundupsUiState
 import com.example.starlingtest.ui.roundups.states.Transaction
 import com.example.starlingtest.ui.roundups.states.roundUp
+import com.example.starlingtest.ui.roundups.states.toAmount
 
 
 class RoundupsStateReducer {
@@ -22,15 +23,13 @@ class RoundupsStateReducer {
             if (outboundTransactions.isEmpty()) {
                 RoundupsUiState.Content.NoTransactions
             } else {
-                val roundUpTotal = computeRoundUpTotal(outboundTransactions)
+                val roundUpTotalInMinorUnits =
+                    outboundTransactions.sumOf { it.amount.amountInMinorUnits.roundUp() }
                 RoundupsUiState.Content.Transactions(
                     since = state.since,
                     transactionsWithRoundUp = RoundupsUiState.Content.TransactionsWithRoundUp(
                         outboundTransactions = outboundTransactions,
-                        roundUpTotal = Amount(
-                            (roundUpTotal * 100).toInt(),
-                            "GBP" // TODO change this
-                        )
+                        roundUpTotal = roundUpTotalInMinorUnits.toAmount("GBP") // TODO: get currency properly
                     )
                 )
             }
@@ -48,10 +47,4 @@ class RoundupsStateReducer {
                     amount = Amount(it.amount.inMinorUnits, it.amount.currency)
                 )
             }
-
-    @VisibleForTesting
-    fun computeRoundUpTotal(outboundTransactions: List<Transaction>) =
-        outboundTransactions.fold(0f) { acc, transaction ->
-            acc + transaction.amount.roundUp().value
-        }
 }

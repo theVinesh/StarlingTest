@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.starlingtest.api.ApiFactory
 import com.example.starlingtest.ui.roundups.data.TransactionsRepository
 import com.example.starlingtest.ui.roundups.reducers.RoundupsStateReducer
+import com.example.starlingtest.ui.roundups.states.Amount
 import com.example.starlingtest.ui.roundups.states.RoundupsScreenEffects
 import com.example.starlingtest.ui.roundups.states.RoundupsState
 import com.example.starlingtest.ui.roundups.states.RoundupsUiState
@@ -30,7 +31,7 @@ class RoundupsScreenVm(
         repository
     ),
     private val stateReducer: RoundupsStateReducer = RoundupsStateReducer(),
-    private val onRoundUp: (Int) -> Unit
+    val onRoundUp: (Amount) -> Unit
 ) : ViewModel() {
     private val clientState = MutableStateFlow(
         value = RoundupsState(
@@ -41,7 +42,7 @@ class RoundupsScreenVm(
 
     val uiState = clientState.map(stateReducer::computeUiState).stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Lazily,
         initialValue = RoundupsUiState.Loading
     )
 
@@ -79,7 +80,7 @@ class RoundupsScreenVm(
             owner: ViewModelStoreOwner,
             accountUid: String?,
             mainWalletUid: String?,
-            onRoundUp: (Int) -> Unit
+            onRoundUp: (Amount) -> Unit
         ) = ViewModelProvider(
             owner,
             factory(
@@ -92,7 +93,7 @@ class RoundupsScreenVm(
         private fun factory(
             accountUid: String?,
             mainWalletUid: String?,
-            onRoundUp: (Int) -> Unit
+            onRoundUp: (Amount) -> Unit
         ) = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
                 RoundupsScreenVm(

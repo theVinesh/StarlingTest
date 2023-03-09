@@ -9,31 +9,36 @@ import androidx.navigation.navArgument
 import com.example.starlingtest.ui.roundups.RoundupsScreen
 import com.example.starlingtest.ui.roundups.viewmodels.RoundupsScreenVm
 
+private const val KEY_ACCOUNT_ID = "roundups-accountUid"
+private const val KEY_WALLET_ID = "roundups-mainWalletUid"
 fun NavGraphBuilder.transactionsDestination(
     navController: NavController
 ) {
     composable(
-        route = "${Destination.TRANSACTIONS.name}/{accountUid}/{mainWalletUid}",
+        route = "${Destination.TRANSACTIONS.name}/{$KEY_ACCOUNT_ID}/{$KEY_WALLET_ID}",
         arguments = listOf(
-            navArgument("accountUid") {
+            navArgument(KEY_ACCOUNT_ID) {
                 type = NavType.StringType
             },
-            navArgument("mainWalletUid") {
+            navArgument(KEY_WALLET_ID) {
                 type = NavType.StringType
             }
         )
     ) {
         val vmStoreOwner = LocalViewModelStoreOwner.current!!
-        val accountUid = it.arguments?.getString("accountUid")
-        val mainWalletUid = it.arguments?.getString("mainWalletUid")
+        val accountUid = it.arguments?.getString(KEY_ACCOUNT_ID)
+        val mainWalletUid = it.arguments?.getString(KEY_WALLET_ID)
         val vm = RoundupsScreenVm.create(
             owner = vmStoreOwner,
             accountUid = accountUid,
             mainWalletUid = mainWalletUid,
             onRoundUp = { amount ->
-                /* navController.navigate(
-                     "${Destination.ROUND_UP.name}/$accountUid/$mainWalletUid/$amount"
-                 )*/
+                navController.navigate(
+                    route = getGoalsRoute(
+                        accountUid = accountUid!!,
+                        amount = amount
+                    )
+                )
             }
         )
         RoundupsScreen(
