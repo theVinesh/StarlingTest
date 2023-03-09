@@ -1,6 +1,6 @@
 package com.example.starlingtest.ui.navigation
 
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -18,8 +18,7 @@ fun getGoalsRoute(accountUid: String, amount: Amount?) =
     "${Destination.GOALS.name}/$accountUid?$KEY_AMOUNT=${amount?.amountInMinorUnits}?$KEY_CURRENCY=${amount?.currency}"
 
 fun NavGraphBuilder.goalsDestination(
-    navController: NavController,
-    createVm: (String?, Amount?) -> GoalsScreenVm
+    navController: NavController
 ) {
     composable(
         route = "${Destination.GOALS.name}/{$KEY_ACCOUNT_ID}?$KEY_AMOUNT={$KEY_AMOUNT}?{$KEY_CURRENCY}={$KEY_CURRENCY}",
@@ -39,11 +38,12 @@ fun NavGraphBuilder.goalsDestination(
     ) {
         val amount = it.arguments?.getLong(KEY_AMOUNT, 0L)
         val currency = it.arguments?.getString(KEY_CURRENCY)
-        val roundUpToTransfer = currency?.let { currencyCode -> Amount(amount!!, currencyCode) }
-        val accountUid = it.arguments?.getString(KEY_ACCOUNT_ID)
-
+        val vm = hiltViewModel<GoalsScreenVm>().apply {
+            accountUid = it.arguments?.getString(KEY_ACCOUNT_ID)
+            roundUpToTransfer = currency?.let { currencyCode -> Amount(amount!!, currencyCode) }
+        }
         GoalsScreen(
-            viewModel = createVm(accountUid, roundUpToTransfer),
+            viewModel = vm,
             onBack = {
                 navController.navigateUp()
             },

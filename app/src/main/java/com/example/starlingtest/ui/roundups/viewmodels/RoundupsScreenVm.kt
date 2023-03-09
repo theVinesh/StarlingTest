@@ -1,16 +1,13 @@
 package com.example.starlingtest.ui.roundups.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.starlingtest.ui.roundups.reducers.RoundupsStateReducer
 import com.example.starlingtest.ui.roundups.states.RoundupsScreenEffects
 import com.example.starlingtest.ui.roundups.states.RoundupsState
 import com.example.starlingtest.ui.roundups.states.RoundupsUiState
 import com.example.starlingtest.ui.roundups.usecases.RefreshTransactionsUseCase
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,13 +18,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import javax.inject.Inject
 
-class RoundupsScreenVm @AssistedInject constructor(
-    @Assisted("accountUid") private val accountUid: String?,
-    @Assisted("mainWalletUid") private val mainWalletUid: String?,
+@HiltViewModel
+class RoundupsScreenVm @Inject constructor(
     private val refreshTransactionsUseCase: RefreshTransactionsUseCase,
     private val stateReducer: RoundupsStateReducer,
 ) : ViewModel() {
+    var accountUid: String? = null
+    var mainWalletUid: String? = null
+
     private val clientState = MutableStateFlow(
         value = RoundupsState(
             transactions = emptyList(),
@@ -67,25 +67,5 @@ class RoundupsScreenVm @AssistedInject constructor(
         }
         showDatePicker(false)
         fetchTransactions(date)
-    }
-
-    @AssistedFactory
-    interface RoundupsScreenVmAssistedFactory {
-        fun create(
-            @Assisted("accountUid") accountUid: String?,
-            @Assisted("mainWalletUid") mainWalletUid: String?,
-        ): RoundupsScreenVm
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    companion object {
-        fun factory(
-            assistedFactory: RoundupsScreenVmAssistedFactory,
-            accountUid: String?,
-            mainWalletUid: String?,
-        ) = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                assistedFactory.create(accountUid, mainWalletUid) as T
-        }
     }
 }

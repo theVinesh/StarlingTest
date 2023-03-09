@@ -1,7 +1,6 @@
 package com.example.starlingtest.ui.goals.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.starlingtest.ui.goals.models.CreateGoalParams
 import com.example.starlingtest.ui.goals.reducers.CreateGoalDialogStateReducer
@@ -16,9 +15,7 @@ import com.example.starlingtest.ui.goals.usecases.CreateGoalUseCase
 import com.example.starlingtest.ui.goals.usecases.RefreshGoalsUseCase
 import com.example.starlingtest.ui.goals.usecases.TransferToGoalUseCase
 import com.example.starlingtest.ui.roundups.states.Amount
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,16 +25,19 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GoalsScreenVm @AssistedInject constructor(
-    @Assisted private val accountUid: String?,
-    @Assisted private val roundUpToTransfer: Amount?,
+@HiltViewModel
+class GoalsScreenVm @Inject constructor(
     private val refreshGoalsUseCase: RefreshGoalsUseCase,
     private val createGoalUseCase: CreateGoalUseCase,
     private val transferToGoalUseCase: TransferToGoalUseCase,
     private val goalsStateReducer: GoalsStateReducer,
     private val dialogStateReducer: CreateGoalDialogStateReducer,
 ) : ViewModel() {
+    var accountUid: String? = null
+    var roundUpToTransfer: Amount? = null
+
     private val clientState = MutableStateFlow(
         value = GoalsState(
             goals = emptyList(),
@@ -129,26 +129,6 @@ class GoalsScreenVm @AssistedInject constructor(
                     navigateToAccounts()
                 }
             )
-        }
-    }
-
-    @AssistedFactory
-    interface GoalsScreenVmAssistedFactory {
-        fun create(
-            accountUid: String?,
-            roundUpToTransfer: Amount?
-        ): GoalsScreenVm
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    companion object {
-        fun factory(
-            assistedFactory: GoalsScreenVmAssistedFactory,
-            accountUid: String?,
-            roundUpToTransfer: Amount?
-        ) = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                assistedFactory.create(accountUid, roundUpToTransfer) as T
         }
     }
 }
