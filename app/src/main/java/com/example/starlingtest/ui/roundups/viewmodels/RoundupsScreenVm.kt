@@ -37,7 +37,7 @@ class RoundupsScreenVm @Inject constructor(
 
     val uiState = clientState.map(stateReducer::computeUiState).stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Lazily,
+        started = SharingStarted.Eagerly,
         initialValue = RoundupsUiState.Loading
     )
 

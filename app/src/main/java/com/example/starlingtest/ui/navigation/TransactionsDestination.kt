@@ -11,7 +11,7 @@ import com.example.starlingtest.ui.roundups.viewmodels.RoundupsScreenVm
 
 private const val KEY_ACCOUNT_ID = "roundups-accountUid"
 private const val KEY_WALLET_ID = "roundups-mainWalletUid"
-fun NavGraphBuilder.transactionsDestination(
+fun NavGraphBuilder.roundUpsDestination(
     navController: NavController
 ) {
     composable(
