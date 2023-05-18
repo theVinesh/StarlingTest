@@ -1,5 +1,5 @@
 # Starling Challenge
-## Candidate : Vinesh Raju
+This was done as a take home test.
 
 > Add your Access Token to the local.properties file.
 
